@@ -1,33 +1,42 @@
-#include<math.h>                              // definicion de la libreria para usar arctang
-#include<Servo.h>                             // definicion de libreria para usar los servos
-Servo servo;                                  // definicion del servo
-double AnguloGrados;                          //definicion de variable para el angulo en grados
-double AnguloRadianes;                        //definicion de variable para el angulo en grados
-int XPin = A1;                                //Pin de eje X   
-int YPin = A4;                                //Pin de eje Y
+#include<math.h>                              //  libreria para arctang
+#include<Servo.h>                             //  libreria para servos
+#define PI 3.1416                             //  valor PI
+#define Min 265                               //  valor minimo
+#define Max 402                               //  valor maximo
 
-void setup() {
-  Serial.begin(9600);                         // definimos el serial en 9600
-  servo.attach(2);                            // definimos el puerto donde se conecta el servomotor
+Servo servo;                                  //  definicion del servo
+double AnguloGrados;                          //  variable para angulo en grados
+double AnguloRadianes;                        //  variable para angulo en radianes
+int XPin = A0;                                //  Pin eje X   
+int YPin = A1;                                //  Pin eje Y
+
+void setup()
+{
+  Serial.begin(9600);                         //  serial en 9600
+  servo.attach(8);                            //  puerto servomotor
 }
 
+void loop() 
+{
+  double x= analogRead(XPin);                 //  valor de la aceleracion en x
+  double y= analogRead(YPin);                 //  valor de la aceleracion en y ( y como eje z en el servo)
+  
+  double xAng= map(x,Min,Max, -90, 90);
+  double yAng= map(y,Min,Max, -90, 90);
 
-void loop() {
-  double x= analogRead(XPin);                 // registramos el valor de la aceleracion en x
-  double y= analogRead(YPin);                 // registramos el valor de la aceleracion en y (en este caso tomamos a y como el jeje z en el servo)
   Serial.print(" El valor de x es: ");        
-  Serial.print(x);                            //impresion de valores de x
+  Serial.print(x);                            //  imprimir valor x
   Serial.print("\n");
 
   Serial.print(" El valor de y es: ");
-  Serial.print(y);                            //impresion de valores de y
+  Serial.print(y);                            //  imprimir valor y
   Serial.print("\n");
   
-  AnguloRadianes = atan2(y,x);                //se calcula el angulo obtenido entre y y x(valor obtenido en radianes)
-  AnguloGrados= AnguloRadianes*180;           //transformamos el angulo a grados
+  AnguloGrados= (RAD_TO_DEG * (atan2(yAng,xAng))+PI)-30;       //  Se calcula angulo entre los vectores 
+                                                               //  y se transformamos el angulo a grados
   Serial.print("El angulo obtenido es: ");    
-  Serial.print(AnguloGrados);                 //impresion del valor en la pantalla
+  Serial.print(AnguloGrados);                 //  imprimir valor angulo 
   Serial.print("\n");
-  servo.write(AnguloGrados);                  //se envia el valor del angulo al servo
-  delay(1000);                                //dejamos un delay de 1 segundo para realizar la siguiente medicion
+  servo.write(AnguloGrados);                  //  se envia el valor del angulo al servo
+  delay(2000);                                //  dejamos un delay de 2 segundo para realizar la siguiente medicion
 }
